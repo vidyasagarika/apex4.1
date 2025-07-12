@@ -1,0 +1,266 @@
+#product.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Listing</title>
+  <link rel="stylesheet" href="sty.css" />
+</head>
+<body>
+  <header>
+    <div class="top-bar">
+      <h1>🛒 G-Mart</h1>
+      <p class="tagline">Your one-stop shop for everything!</p>
+    </div>
+
+    <div class="header-controls">
+      <div class="filters">
+        <select id="categoryFilter">
+          <option value="all">All Categories</option>
+          <option value="electronics">Electronics</option>
+          <option value="fashion">Fashion</option>
+          <option value="home-appliances">Home Appliances</option>
+          <option value="beauty">beauty</option>
+          
+        </select>
+
+        <select id="sortOption">
+          <option value="default">Sort By</option>
+          <option value="priceLow">Price: Low to High</option>
+          <option value="priceHigh">Price: High to Low</option>
+          <option value="ratingHigh">Rating: High to Low</option>
+        </select>
+      </div>
+
+      <div class="cart-icon">
+        🛒 Cart: <span id="cartCount">0</span>
+      </div>
+      <button onclick="clearCart()">Clear Cart</button>
+    </div>
+  </header>
+
+  <main id="productContainer" class="product-container"></main>
+
+  <script src="scr.js"></script>
+</body>
+</html>
+
+
+
+#scr.js
+// Product data
+const products = [
+  { id: 1, name: "Smartphone", category: "electronics", price: 15000, rating: 4.5, img: "smartphone.jfif" },
+  { id: 2, name: "T-Shirt", category: "fashion", price: 500, rating: 4.0, img: "tshirt.webp" },
+  { id: 3, name: "Laptop", category: "electronics", price: 45000, rating: 4.8, img: "laptop.jfif" },
+  { id: 4, name: "Sneakers", category: "fashion", price: 2000, rating: 4.3, img: "sneakers.avif" },
+  { id: 5, name: "Headphones", category: "electronics", price: 1200, rating: 4.2, img: "headphones.jfif" },
+  { id: 6, name: "Frock", category: "fashion", price: 900, rating: 4.4, img: "frock.jpg" },
+  { id: 7, name: "Smartwatch", category: "electronics", price: 2999, rating: 4.1, img: "smartwatch.jpg" },
+  { id: 8, name: "Tablet", category: "electronics", price: 12000, rating: 4.3, img: "tablet.jfif" },
+  { id: 9, name: "Bluetooth Speaker", category: "electronics", price: 1800, rating: 4.4, img: "speaker.jfif" },
+  { id: 10, name: "Power Bank", category: "electronics", price: 999, rating: 4.0, img: "powerbank.jpg" },
+  { id: 11, name: "Gaming Mouse", category: "electronics", price: 750, rating: 4.6, img: "mouse.jfif" },
+  { id: 12, name: "Webcam", category: "electronics", price: 1400, rating: 4.2, img: "webcam.jfif" },
+  { id: 13, name: "Jeans", category: "fashion", price: 1200, rating: 4.3, img: "jeans.jfif" },
+  { id: 14, name: "Kurti", category: "fashion", price: 850, rating: 4.1, img: "kurti.jfif" },
+  { id: 15, name: "Cap", category: "fashion", price: 300, rating: 4.0, img: "cap.jfif" },
+  { id: 16, name: "Jacket", category: "fashion", price: 1800, rating: 4.5, img: "jacket.webp" },
+  { id: 17, name: "Saree", category: "fashion", price: 2500, rating: 4.6, img: "saree.jfif" },
+  { id: 19, name: "Air Conditioner", category: "home-appliances", price: 32000, rating: 4.5, img: "ac.jfif" },
+  { id: 20, name: "Refrigerator", category: "home-appliances", price: 28000, rating: 4.4, img: "fridge.jfif" },
+  { id: 21, name: "Microwave Oven", category: "home-appliances", price: 8000, rating: 4.3, img: "microwave.webp" },
+  { id: 22, name: "Washing Machine", category: "home-appliances", price: 22000, rating: 4.2, img: "washingmachine.jfif" },
+  { id: 23, name: "Lipstick", category: "beauty", price: 299, rating: 4.3, img: "lipstick.jfif" },
+  { id: 24, name: "Face Wash", category: "beauty", price: 199, rating: 4.2, img: "facewash.jfif" },
+  { id: 25, name: "Moisturizer", category: "beauty", price: 350, rating: 4.4, img: "moisturizer.jfif" },
+];
+
+const productContainer = document.getElementById("productContainer");
+const categoryFilter = document.getElementById("categoryFilter");
+const sortOption = document.getElementById("sortOption");
+const cartCount = document.getElementById("cartCount");
+
+function displayProducts(items) {
+  productContainer.innerHTML = "";
+  items.forEach(product => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.innerHTML = `
+      <img src="${product.img}" alt="${product.name}" class="product-img">
+      <h3>${product.name}</h3>
+      <p>Category: ${product.category}</p>
+      <p>Price: ₹${product.price}</p>
+      <p>Rating: ${product.rating}</p>
+      <button class="cart-btn" data-id="${product.id}">Add to Cart</button>
+    `;
+    productContainer.appendChild(card);
+  });
+
+  document.querySelectorAll(".cart-btn").forEach(btn => {
+    btn.addEventListener("click", addToCart);
+  });
+}
+
+function filterAndSortProducts() {
+  let filtered = [...products];
+  const selectedCategory = categoryFilter.value;
+  const sort = sortOption.value;
+
+  if (selectedCategory !== "all") {
+    filtered = filtered.filter(p => p.category === selectedCategory);
+  }
+
+  if (sort === "priceLow") filtered.sort((a, b) => a.price - b.price);
+  if (sort === "priceHigh") filtered.sort((a, b) => b.price - a.price);
+  if (sort === "ratingHigh") filtered.sort((a, b) => b.rating - a.rating);
+
+  displayProducts(filtered);
+}
+
+function addToCart(e) {
+  const id = parseInt(e.target.getAttribute("data-id"));
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const product = products.find(p => p.id === id);
+
+  if (!cart.find(item => item.id === id)) {
+    cart.push(product);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartCount();
+    alert(`${product.name} added to cart!`);
+  } else {
+    alert("Item already in cart");
+  }
+}
+
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  if (cartCount) {
+    cartCount.textContent = cart.length;
+  }
+}
+
+function clearCart() {
+  localStorage.removeItem("cart");
+  updateCartCount();
+  alert("Cart has been cleared.");
+}
+
+categoryFilter.addEventListener("change", filterAndSortProducts);
+sortOption.addEventListener("change", filterAndSortProducts);
+
+displayProducts(products);
+updateCartCount();
+
+
+
+#sty.css
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f4f4f4;
+}
+
+header {
+  background: #2a692c;
+  padding: 20px;
+  text-align: center;
+  color: white;
+}
+
+.filters {
+  margin-top: 10px;
+}
+
+.filters select {
+  padding: 8px;
+  margin: 10px 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.product-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.product-card {
+  background: #fff;
+  width: 220px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 15px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.product-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.cart-btn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cart-btn:hover {
+  background-color: #218838;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .product-card {
+    width: 90%;
+  }
+}
+
+.top-bar {
+  margin-bottom: 10px;
+}
+
+.tagline {
+  font-size: 14px;
+  font-weight: 300;
+  margin-top: -10px;
+  color: #d3fcd2;
+}
+
+.header-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.cart-icon {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+button {
+  padding: 8px 12px;
+  background-color: #ff4d4d;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
